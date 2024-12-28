@@ -1,0 +1,293 @@
+get_task:
+  name: Get Task
+  description: "Returns a task by Project ID and Task ID from TickTick."
+  fields:
+    projectId:
+      name: Project ID
+      description: ID of the project (list) of tasks in TickTick.
+      required: true
+      example: 6987a8plg0rad90bc38b672f
+      selector:
+        text: null
+    taskId:
+      name: Task ID
+      description: ID of the task in TickTick.
+      required: true
+      example: 63b7bebb91c0a5474805fcd4
+      selector:
+        text: null
+create_task:
+  name: Create Task
+  description: "Creates a task in TickTick."
+  fields:
+    projectId:
+      name: Project ID
+      description: ID of the project (list) of tasks in TickTick.
+      required: true
+      example: 6987a8plg0rad90bc38b672f
+      selector:
+        text: null
+    title:
+      name: Title
+      description: "Task title."
+      required: true
+      example: To buy a cofee
+      selector:
+        text: null
+    desc:
+      name: Description
+      description: "Description of the checklist."
+      selector:
+        text: null
+    is_all_day:
+      name: Lasts all day
+      description: "Flag indicating Whether the task is all day."
+      selector:
+        constant:
+          value: true
+          label: All Day
+    start_date:
+      name: Start Date
+      description: "Start date and time in 'yyyy-MM-dd'T'HH:mm:ssZ' format."
+      example: 2024-12-29T03:00:00+0000
+      selector:
+        datetime: {}
+    due_date:
+      name: Due Date
+      description: "Due date and time in 'yyyy-MM-dd'T'HH:mm:ssZ' format."
+      example: 2025-01-10T03:00:00+0000
+      selector:
+        datetime: {}
+    time_zone:
+      name: Time Zone
+      description: "The time zone in which the time is specified."
+      selector:
+        text: null
+    repeat_flag:
+      name: Repeat Flag
+      description: "Recurring rules of the task."
+      selector:
+        text: null
+    priority:
+      name: Priority
+      description: "The priority of the task."
+      selector:
+        select:
+          options:
+            - label: Low
+              value: 1
+            - label: Medium
+              value: 3
+            - label: High
+              value: 5
+    status:
+      name: Task Completed
+      description: "Completed task."
+      selector:
+        constant:
+          value: 2
+          label: Completed
+    sort_order:
+      name: Sort Order
+      description: "The order of the task."
+      selector:
+        number: null
+    reminders:
+      name: Reminders
+      description: "Sets reminders for the task"
+      example: \"TRIGGER:P0DT9H0M0S\", \"TRIGGER:PT0S\"
+      selector:
+        text:
+          multiple: true
+update_task:
+  name: Update Task
+  description: "Updates a task in TickTick."
+  fields:
+    Id:
+      name: Task ID
+      description: ID of the task in TickTick.
+      required: true
+      example: 63b7bebb91c0a5474805fcd4
+      selector:
+        text: null
+    projectId:
+      name: Project ID
+      description: ID of the project (list) of tasks in TickTick.
+      required: true
+      example: 6987a8plg0rad90bc38b672f
+      selector:
+        text: null
+    title:
+      name: Title
+      description: "Task title."
+      required: true
+      example: To buy a cofee
+      selector:
+        text: null
+    desc:
+      name: Description
+      description: "Description of the checklist."
+      selector:
+        text: null
+    is_all_day:
+      name: Lasts all day
+      description: "Flag indicating Whether the task is all day."
+      selector:
+        constant:
+          value: true
+          label: All Day
+    start_date:
+      name: Start Date
+      description: "Start date and time in 'yyyy-MM-dd'T'HH:mm:ssZ' format."
+      example: 2024-12-29T03:00:00+0000
+      selector:
+        datetime: {}
+    due_date:
+      name: Due Date
+      description: "Due date and time in 'yyyy-MM-dd'T'HH:mm:ssZ' format."
+      example: 2025-01-10T03:00:00+0000
+      selector:
+        datetime: {}
+    time_zone:
+      name: Time Zone
+      description: "The time zone in which the time is specified."
+      selector:
+        text: null
+    repeat_flag:
+      name: Repeat Flag
+      description: "Recurring rules of the task."
+      selector:
+        text: null
+    priority:
+      name: Priority
+      description: "The priority of the task."
+      selector:
+        select:
+          options:
+            - label: Low
+              value: 1
+            - label: Medium
+              value: 3
+            - label: High
+              value: 5
+    sort_order:
+      name: Sort Order
+      description: "The order of the task."
+      selector:
+        number: null
+    reminders:
+      name: Reminders
+      description: "Sets reminders for the task"
+      example: \"TRIGGER:P0DT9H0M0S\", \"TRIGGER:PT0S\"
+      selector:
+        text:
+          multiple: true
+complete_task:
+  name: Complete Task
+  description: "Sets a task as done, completes a task in TickTick"
+  fields:
+    projectId:
+      name: Project ID
+      description: ID of the project (list) of tasks in TickTick.
+      required: true
+      example: 6987a8plg0rad90bc38b672f
+      selector:
+        text: null
+    taskId:
+      name: Task ID
+      description: ID of the task in TickTick.
+      required: true
+      example: 63b7bebb91c0a5474805fcd4
+      selector:
+        text: null
+delete_task:
+  name: Delete Task
+  description: "Deletes a task from TickTick"
+  icon: mdi:delete
+  fields:
+    projectId:
+      name: Project ID
+      description: ID of the project (list) of tasks in TickTick.
+      required: true
+      example: 6987a8plg0rad90bc38b672f
+      selector:
+        text: null
+    taskId:
+      name: Task ID
+      description: ID of the task in TickTick.
+      required: true
+      example: 63b7bebb91c0a5474805fcd4
+      selector:
+        text: null
+get_projects:
+  name: Get Projects
+  description: "Returns a list of your projects basic information from TickTick"
+get_project:
+  description: "Returns a project by Project ID basic information from TickTick"
+  fields:
+    projectId:
+      name: Project ID
+      description: ID of the project (list) of tasks in TickTick.
+      required: true
+      example: 6987a8plg0rad90bc38b672f
+      selector:
+        text: null
+get_detailed_project:
+  description: "Returns a project by Project ID detailed information from TickTick"
+  fields:
+    projectId:
+      name: Project ID
+      description: ID of the project (list) of tasks in TickTick.
+      required: true
+      example: 6987a8plg0rad90bc38b672f
+      selector:
+        text: null
+create_project:
+  description: "Creates a project in TickTick."
+  fields:
+    name:
+      name: Name
+      description: "Name of the project."
+      required: true
+      example: "Shopping list"
+      selector:
+        text: null
+    color:
+      name: Project Color
+      description: "Color of the project"
+      example: #F18181
+      selector:
+        text: null
+    sort_order:
+      name: Sort Order
+      description: "Sort order value of the project."
+      selector:
+        number:
+          min: 0
+    view_mode:
+      name: View Mode
+      description: "View mode of the project."
+      selector:
+        select:
+          options:
+            - list
+            - kanban
+            - timeline
+    kind:
+      name: Project Kind
+      description: "Kind of the project."
+      selector:
+        select:
+          options:
+            - TASK
+            - NOTE
+delete_project:
+  description: "Deletes a project by Project ID from TickTick"
+  fields:
+    projectId:
+      name: Project ID
+      description: ID of the project (list) of tasks in TickTick.
+      required: true
+      example: 6987a8plg0rad90bc38b672f
+      selector:
+        text: null

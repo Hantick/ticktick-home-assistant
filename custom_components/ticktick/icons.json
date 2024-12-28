@@ -1,0 +1,22 @@
+{
+    "services": {
+        "get_task": {
+            "service": "mdi:invoice-list"
+        },
+        "create_task": {
+            "service": "mdi:creation"
+        },
+        "update_task": {
+            "service": "mdi:arrow-up-bold-hexagon-outline"
+        },
+        "complete_task": {
+            "service": "mdi:check-decagram"
+        },
+        "delete_task": {
+            "service": "mdi:delete"
+        },
+        "get_projects": {
+            "service": "mdi:list-box"
+        }
+    }
+}

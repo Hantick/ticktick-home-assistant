@@ -1,13 +1,20 @@
 {
   "domain": "ticktick",
   "name": "TickTick",
-  "codeowners": ["@Hantick"],
+  "codeowners": [
+    "@Hantick"
+  ],
   "config_flow": true,
+  "dependencies": [
+    "application_credentials"
+  ],
   "documentation": "https://github.com/Hantick/ticktick-home-assistant",
   "issue_tracker": "https://github.com/Hantick/ticktick-home-assistant/issues",
-  "requirements": [
-    "requests<3.0.0"
-  ],
+  "homekit": {},
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "ssdp": [],
+  "zeroconf": [],
   "integration_type": "service",
-  "version": "0.1.0"
+  "version": "1.0.0"
 }
