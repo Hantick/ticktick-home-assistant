@@ -16,5 +16,5 @@
   "ssdp": [],
   "zeroconf": [],
   "integration_type": "service",
-  "version": "1.0.0"
+  "version": "0.0.1"
 }

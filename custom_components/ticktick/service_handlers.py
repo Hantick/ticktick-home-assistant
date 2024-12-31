@@ -1,43 +1,39 @@
 """Service Hanlders for TickTick Integration."""
 
 from collections.abc import Awaitable, Callable
-from typing import Any, Type, TypeVar
+from typing import Any, TypeVar
 
-from custom_components.ticktick.ticktick.task import Task
+from custom_components.ticktick.ticktick_api_python.models.task import Task
+
 from homeassistant.core import ServiceCall
 
 from .const import PROJECT_ID, TASK_ID
-from .ticktick.ticktick_api import TickTickApiClient
+from .ticktick_api_python.ticktick_api import TickTickAPIClient
 
 
 # === Task Scope ===
-async def handle_get_task(client: TickTickApiClient) -> Callable:
+async def handle_get_task(client: TickTickAPIClient) -> Callable:
     """Return a handler function for the 'get_task' endpoint."""
     return await _create_handler(client.get_task, PROJECT_ID, TASK_ID)
 
 
-async def handle_create_task(client: TickTickApiClient) -> Callable:
+async def handle_create_task(client: TickTickAPIClient) -> Callable:
     """Return a handler function for the 'create_task' endpoint."""
     return await _create_handler(client.create_task, *(Task.get_arg_names()), type=Task)
 
 
-async def handle_update_task(client: TickTickApiClient) -> Callable:
-    """Return a handler function for the 'update_task' endpoint."""
-    return await _create_handler(client.update_task, *(Task.get_arg_names()), type=Task)
-
-
-async def handle_complete_task(client: TickTickApiClient) -> Callable:
+async def handle_complete_task(client: TickTickAPIClient) -> Callable:
     """Return a handler function for the 'complete_task' endpoint."""
     return await _create_handler(client.complete_task, PROJECT_ID, TASK_ID)
 
 
-async def handle_delete_task(client: TickTickApiClient) -> Callable:
+async def handle_delete_task(client: TickTickAPIClient) -> Callable:
     """Return a handler function for the 'delete_task' endpoint."""
     return await _create_handler(client.delete_task, PROJECT_ID, TASK_ID)
 
 
 # === Project Scope ===
-async def handle_get_projects(client: TickTickApiClient) -> Callable:
+async def handle_get_projects(client: TickTickAPIClient) -> Callable:
     """Return a handler function for the 'get_projects' endpoint."""
     return await _create_handler(client.get_projects)
 
@@ -62,7 +58,7 @@ async def _create_handler(
                 instance = type(**args)
                 response = await client_method(instance)
             else:
-                response = await client_method(**args)
+                response = await client_method(**args, returnAsJson=True)
 
             return {"data": response}  # noqa: TRY300
         except Exception as e:  # noqa: BLE001

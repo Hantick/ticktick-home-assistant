@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
+import datetime
+import logging
+
+from custom_components.ticktick.coordinator import TickTickCoordinator
+
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, SupportsResponse
 from homeassistant.helpers import aiohttp_client, config_entry_oauth2_flow
 
@@ -11,14 +17,19 @@ from .const import DOMAIN
 from .service_handlers import (
     handle_complete_task,
     handle_create_task,
-    handle_update_task,
     handle_delete_task,
     handle_get_projects,
     handle_get_task,
 )
-from .ticktick.ticktick_api import TickTickApiClient
+from .ticktick_api_python.ticktick_api import TickTickAPIClient
 
 type TickTickConfigEntry = ConfigEntry[api.AsyncConfigEntryAuth]
+
+_LOGGER = logging.getLogger(__name__)
+
+SCAN_INTERVAL = datetime.timedelta(minutes=1)
+
+PLATFORMS = [Platform.TODO]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: TickTickConfigEntry) -> bool:
@@ -38,23 +49,41 @@ async def async_setup_entry(hass: HomeAssistant, entry: TickTickConfigEntry) -> 
     )
 
     access_token = await entry.runtime_data.async_get_access_token()
-    tickTickApiClient = TickTickApiClient(entry.runtime_data._websession, access_token)  # noqa: SLF001
+    tickTickApiClient = TickTickAPIClient(access_token)
 
+    await register_coordiantor(hass, tickTickApiClient, entry, access_token)
     await register_services(hass, tickTickApiClient)
 
-    platforms = []  # no platforms for now, change in the future TODO
-    await hass.config_entries.async_forward_entry_setups(entry, platforms)
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: TickTickConfigEntry) -> bool:
     """Unload a TickTick config entry."""
-    return await hass.config_entries.async_unload(entry)
+    if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
+        hass.data[DOMAIN].pop(entry.entry_id)
+
+    return unload_ok
+
+
+async def register_coordiantor(
+    hass: HomeAssistant,
+    tickTickApiClient: TickTickAPIClient,
+    entry: TickTickConfigEntry,
+    access_token: str,
+) -> None:
+    """Register Coordinator for TickTick Todo Entity."""
+    coordinator = TickTickCoordinator(
+        hass, _LOGGER, entry, SCAN_INTERVAL, tickTickApiClient, access_token
+    )
+    await coordinator.async_config_entry_first_refresh()
+    hass.data.setdefault(DOMAIN, {})
+    hass.data[DOMAIN][entry.entry_id] = coordinator
 
 
 async def register_services(
-    hass: HomeAssistant, tickTickApiClient: TickTickApiClient
+    hass: HomeAssistant, tickTickApiClient: TickTickAPIClient
 ) -> None:
     """Register TickTick services."""
 
@@ -62,19 +91,13 @@ async def register_services(
         DOMAIN,
         "get_task",
         await handle_get_task(tickTickApiClient),
-        supports_response=SupportsResponse.OPTIONAL,
+        supports_response=SupportsResponse.ONLY,
     )
     hass.services.async_register(
         DOMAIN,
         "create_task",
         await handle_create_task(tickTickApiClient),
-        supports_response=SupportsResponse.OPTIONAL,
-    )
-    hass.services.async_register(
-        DOMAIN,
-        "update_task",
-        await handle_update_task(tickTickApiClient),
-        supports_response=SupportsResponse.OPTIONAL,
+        supports_response=SupportsResponse.ONLY,
     )
     hass.services.async_register(
         DOMAIN,
@@ -93,7 +116,7 @@ async def register_services(
         DOMAIN,
         "get_projects",
         await handle_get_projects(tickTickApiClient),
-        supports_response=SupportsResponse.OPTIONAL,
+        supports_response=SupportsResponse.ONLY,
     )
     # hass.services.async_register(DOMAIN, 'get_project', await handle_my_service)
     # hass.services.async_register(DOMAIN, 'get_detailed_project', handle_my_service(tickTickApiClient))

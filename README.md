@@ -4,7 +4,7 @@
 ![GitHub Repo stars](https://img.shields.io/github/stars/Hantick/ticktick-home-assistant?style=for-the-badge&color=%23AFB0CC)
 ![GitHub Release](https://img.shields.io/github/v/release/Hantick/ticktick-home-assistant?style=for-the-badge&color=%231CB00A)
 
-Integration implements [TickTick Open API](https://developer.ticktick.com/docs#/openapi) and exposes it as services in Home Assistant, allowing you to manage your tasks and projects programmatically 😎
+Integration implements [TickTick Open API](https://developer.ticktick.com/docs#/openapi) with support for [To-do list](https://www.home-assistant.io/integrations/todo/) entities and exposes it as services in Home Assistant, allowing you to manage your tasks and projects programmatically 😎
 
 ## Installation
 
@@ -33,4 +33,3 @@ Get (Create, Update, Delete are missing for now)
 - Create Project
 - Update Project
 - Delete Project
-- Some sensors and entities creation

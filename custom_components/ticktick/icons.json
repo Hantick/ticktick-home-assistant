@@ -6,9 +6,6 @@
         "create_task": {
             "service": "mdi:creation"
         },
-        "update_task": {
-            "service": "mdi:arrow-up-bold-hexagon-outline"
-        },
         "complete_task": {
             "service": "mdi:check-decagram"
         },
