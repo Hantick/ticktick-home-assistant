@@ -19,10 +19,10 @@ from .models.task import Task
 class TickTickAPIClient:
     """TickTick API Client."""
 
-    def __init__(self, access_token: str, session: ClientSession = None) -> None:
+    def __init__(self, access_token: str, session: ClientSession) -> None:
         """Initialize the TickTick API client."""
         self._headers = {"Authorization": f"Bearer {access_token}"}
-        self._session = session or ClientSession()
+        self._session = session
 
     # === Task Scope ===
     async def get_task(

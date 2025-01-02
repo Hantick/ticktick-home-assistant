@@ -44,12 +44,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: TickTickConfigEntry) -> 
     session = config_entry_oauth2_flow.OAuth2Session(hass, entry, implementation)
 
     # Using an aiohttp-based API lib
-    entry.runtime_data = api.AsyncConfigEntryAuth(
-        aiohttp_client.async_get_clientsession(hass), session
-    )
+    aiohttp_session = aiohttp_client.async_get_clientsession(hass)
+    entry.runtime_data = api.AsyncConfigEntryAuth(aiohttp_session, session)
 
     access_token = await entry.runtime_data.async_get_access_token()
-    tickTickApiClient = TickTickAPIClient(access_token)
+    tickTickApiClient = TickTickAPIClient(access_token, aiohttp_session)
 
     await register_coordiantor(hass, tickTickApiClient, entry, access_token)
     await register_services(hass, tickTickApiClient)
