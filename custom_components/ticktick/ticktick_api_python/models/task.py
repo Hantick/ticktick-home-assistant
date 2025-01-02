@@ -108,7 +108,9 @@ class Task(CheckListItem):
 
         return Task(
             projectId=data["projectId"],
-            title=data["title"],
+            title=data.get("title")
+            if data.get("title") is not None
+            else "Unnamed Task",
             id=data.get("id"),
             desc=data.get("desc"),
             content=data.get("content"),

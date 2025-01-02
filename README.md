@@ -9,7 +9,7 @@ Integration implements [TickTick Open API](https://developer.ticktick.com/docs#/
 ## Installation
 
 1. Navigate to [TickTick Developer](https://developer.ticktick.com/manage) and click `New App`
-2. Name your app and set `OAuth redirect URL` to `https://my.home-assistant.io/redirect/oauth`
+2. Name your app and set `OAuth redirect URL` to `https://my.home-assistant.io/redirect/oauth` or your instance url i.e `http://homeassistant.local:8123`
 3. Add this repository in HACS and download TickTick Integration via HACS
 4. Setup the integration in devices tab
 

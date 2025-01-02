@@ -56,13 +56,17 @@ class Project:
         return Project(
             id=data["id"],
             groupId=data.get("groupId"),
-            name=data["name"],
+            name=data.get("name")
+            if data.get("name") is not None
+            else "Unnamed Project",
             color=data.get("color"),
-            sortOrder=data["sortOrder"],
+            sortOrder=data.get["sortOrder"] if data.get("sortOrder") is not None else 0,
             closed=data.get("closed"),
             viewMode=ViewMode(data["viewMode"])
             if data.get("viewMode") is not None
             else None,
-            permission=Permission(data["permission"]),
-            kind=Kind(data["kind"]),
+            permission=Permission(data["permission"])
+            if data.get("permission") is not None
+            else None,
+            kind=Kind(data["kind"]) if data.get("kind") is not None else None,
         )
