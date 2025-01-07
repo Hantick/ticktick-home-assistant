@@ -34,3 +34,20 @@ class CheckListItem:
         self.startDate = startDate
         self.status = status
         self.timeZone = timeZone
+
+    @staticmethod
+    def from_dict(data: dict) -> "CheckListItem":
+        """Create a CheckListItem instance from a dictionary."""
+
+        return CheckListItem(
+            title=data.get("title")
+            if data.get("title") is not None
+            else "Unnamed SubTask",
+            id=data.get("id"),
+            sortOrder=data.get("sortOrder"),
+            isAllDay=data.get("isAllDay"),
+            startDate=data.get("startDate"),
+            completedTime=data.get("completedTime"),
+            timeZone=data.get("timeZone"),
+            status=TaskStatus(data.get("status", TaskStatus.NORMAL.value)),
+        )
