@@ -35,16 +35,22 @@ class TickTickAPIClient:
 
         return Task.from_dict(response)
 
-    async def create_task(self, task: Task) -> Task:
+    async def create_task(self, task: Task, returnAsJson: bool = False) -> Task:
         """Create a task."""
         json = task.toJSON()
         response = await self._post(CREATE_TASK, json)
+        if returnAsJson:
+            return response
+
         return Task.from_dict(response)
 
-    async def update_task(self, task: Task) -> Task:
+    async def update_task(self, task: Task, returnAsJson: bool = False) -> Task:
         """Update a task."""
         json = task.toJSON()
         response = await self._post(UPDATE_TASK.format(taskId=task.id), json)
+        if returnAsJson:
+            return response
+
         return Task.from_dict(response)
 
     async def complete_task(self, projectId: str, taskId: str) -> str:

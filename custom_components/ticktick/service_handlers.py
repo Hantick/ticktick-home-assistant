@@ -1,11 +1,14 @@
 """Service Hanlders for TickTick Integration."""
 
 from collections.abc import Awaitable, Callable
+from datetime import datetime
 from typing import Any, TypeVar
+from zoneinfo import ZoneInfo
 
 from custom_components.ticktick.ticktick_api_python.models.task import Task
 
 from homeassistant.core import ServiceCall
+from homeassistant.util import dt as dt_util
 
 from .const import PROJECT_ID, TASK_ID
 from .ticktick_api_python.ticktick_api import TickTickAPIClient
@@ -54,9 +57,15 @@ async def _create_handler(
         args = {arg: call.data.get(arg) for arg in arg_names}
         try:
             response = None
-            if type:
+            if type == Task:
+                if "dueDate" in args and isinstance(args["dueDate"], str):
+                    args["dueDate"] = _sanitize_date(args["dueDate"], args["timeZone"])
+                if "startDate" in args and isinstance(args["startDate"], str):
+                    args["startDate"] = _sanitize_date(
+                        args["startDate"], args["timeZone"]
+                    )
                 instance = type(**args)
-                response = await client_method(instance)
+                response = await client_method(instance, returnAsJson=True)
             else:
                 response = await client_method(**args, returnAsJson=True)
 
@@ -65,3 +74,15 @@ async def _create_handler(
             return {"error": str(e)}
 
     return handler
+
+
+def _sanitize_date(date: str, timeZone: str | None) -> datetime:
+    naive_dt = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+    if timeZone:
+        zone_info = ZoneInfo(timeZone)
+    else:
+        zone_info = dt_util.get_default_time_zone()
+
+    aware_dt = naive_dt.replace(tzinfo=zone_info)
+
+    return aware_dt.strftime("%Y-%m-%dT%H:%M:%S%z")
