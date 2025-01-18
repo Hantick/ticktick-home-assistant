@@ -63,7 +63,7 @@ class Project:
             sortOrder=data["sortOrder"],
             closed=data.get("closed"),
             viewMode=ViewMode(data["viewMode"])
-            if data.get("viewMode") is not None
+            if data.get("viewMode") is not None and data.get("viewMode") != ""
             else None,
             permission=Permission(data["permission"])
             if data.get("permission") is not None
