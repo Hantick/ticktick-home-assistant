@@ -41,7 +41,7 @@ class CheckListItem:
 
         return CheckListItem(
             title=data.get("title")
-            if data.get("title") is not None
+            if data.get("title")
             else "Unnamed SubTask",
             id=data.get("id"),
             sortOrder=data.get("sortOrder"),

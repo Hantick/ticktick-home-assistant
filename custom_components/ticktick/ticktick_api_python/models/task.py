@@ -61,9 +61,9 @@ class Task(CheckListItem):
         self.content = content
         self.desc = desc
         self.dueDate = dueDate
-        self.items = items if items is not None else []
+        self.items = items if items else []
         self.priority = priority
-        self.reminders = reminders if reminders is not None else []
+        self.reminders = reminders if reminders else []
         self.repeatFlag = repeatFlag
 
     def toJSON(self):
@@ -109,7 +109,7 @@ class Task(CheckListItem):
         return Task(
             projectId=data["projectId"],
             title=data.get("title")
-            if data.get("title") is not None
+            if data.get("title")
             else "Unnamed Task",
             id=data.get("id"),
             desc=data.get("desc"),

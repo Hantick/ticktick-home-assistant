@@ -57,16 +57,16 @@ class Project:
             id=data["id"],
             groupId=data.get("groupId"),
             name=data.get("name")
-            if data.get("name") is not None
+            if data.get("name")
             else "Unnamed Project",
             color=data.get("color"),
             sortOrder=data["sortOrder"],
             closed=data.get("closed"),
             viewMode=ViewMode(data["viewMode"])
-            if data.get("viewMode") is not None
+            if data.get("viewMode")
             else None,
             permission=Permission(data["permission"])
-            if data.get("permission") is not None
+            if data.get("permission")
             else None,
-            kind=Kind(data["kind"]) if data.get("kind") is not None else None,
+            kind=Kind(data["kind"]) if data.get("kind") else None,
         )
