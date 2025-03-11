@@ -210,3 +210,99 @@ delete_project:
       example: 6987a8plg0rad90bc38b672f
       selector:
         text: null
+update_task:
+  name: Update Task
+  description: "Updates an existing task in TickTick. Only provided fields will be updated."
+  fields:
+    projectId:
+      name: Project ID
+      description: ID of the project (list) of tasks in TickTick.
+      required: true
+      example: 6987a8plg0rad90bc38b672f
+      selector:
+        text: null
+    taskId:
+      name: Task ID
+      description: ID of the task in TickTick.
+      required: true
+      example: 63b7bebb91c0a5474805fcd4
+      selector:
+        text: null
+    title:
+      name: Title
+      description: "Task title."
+      required: false
+      example: To buy a coffee
+      selector:
+        text: null
+    content:
+      name: Content
+      description: "Task content."
+      required: false
+      example: Coffee for the author and for myself.
+      selector:
+        text: null
+    desc:
+      name: Description
+      description: "Description of the checklist."
+      required: false
+      selector:
+        text: null
+    isAllDay:
+      name: Lasts all day
+      description: "Flag indicating Whether the task is all day."
+      required: false
+      selector:
+        boolean: null
+    startDate:
+      name: Start Date
+      description: "Start date and time in 'yyyy-MM-dd HH:mm:ss' format."
+      required: false
+      example: 2024-12-29 03:00:00
+      selector:
+        datetime: {}
+    dueDate:
+      name: Due Date
+      description: "Due date and time in 'yyyy-MM-dd HH:mm:ss' format."
+      required: false
+      example: 2025-01-10T03:00:00
+      selector:
+        datetime: {}
+    timeZone:
+      name: Time Zone
+      description: "The time zone in which the time is specified."
+      required: false
+      selector:
+        text: null
+    repeatFlag:
+      name: Repeat Flag
+      description: "Recurring rules of the task."
+      required: false
+      selector:
+        text: null
+    reminders:
+      name: Reminders
+      description: "Reminders triggers for a task in iCalendar format i.e TRIGGER:P0DT9H0M0S"
+      required: false
+      example: "TRIGGER:P0DT9H0M0S"
+      selector:
+        text:
+          multiple: true
+    priority:
+      name: Priority
+      description: "The priority of the task."
+      required: false
+      selector:
+        select:
+          options:
+            - LOW
+            - MEDIUM
+            - HIGH
+    sortOrder:
+      name: Sort Order
+      description: "The order of the task."
+      required: false
+      selector:
+        number:
+          min: 0
+          max: 1000

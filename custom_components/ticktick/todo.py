@@ -1,5 +1,6 @@
 import asyncio
 from typing import Any
+from datetime import datetime
 
 from custom_components.ticktick.coordinator import TickTickCoordinator
 from custom_components.ticktick.ticktick_api_python.models.task import Task, TaskStatus
@@ -30,6 +31,19 @@ async def async_setup_entry(
     )
 
 
+def _format_date_for_comparison(date_value) -> str:
+    """Format a date value for comparison, handling different types."""
+    if date_value is None:
+        return ""
+    if isinstance(date_value, datetime):
+        # Convert datetime to string in a consistent format
+        return date_value.isoformat()
+    if isinstance(date_value, str):
+        return date_value.strip()
+    # For any other type, convert to string
+    return str(date_value).strip()
+
+
 def _map_task(
     item: TodoItem, projectId: str, api_task: Task | None = None
 ) -> tuple[Task, bool]:
@@ -42,9 +56,15 @@ def _map_task(
         if (item.description or "").strip() != (api_task.content or "").strip():
             api_task.content = item.description
             modified = True
-        if (item.due or "").strip() != (api_task.dueDate or "").strip():
+        
+        # Handle due date comparison with proper type checking
+        item_due_str = _format_date_for_comparison(item.due)
+        api_due_str = _format_date_for_comparison(api_task.dueDate)
+        
+        if item_due_str != api_due_str:
             api_task.dueDate = item.due
             modified = True
+            
         return api_task, modified
     return Task(
         projectId=projectId,
