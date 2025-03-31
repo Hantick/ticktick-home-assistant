@@ -15,7 +15,11 @@ Integration implements [TickTick Open API](https://developer.ticktick.com/docs#/
 1. Navigate to [TickTick Developer](https://developer.ticktick.com/manage) and click `New App`
 2. Name your app and set `OAuth redirect URL` to `https://my.home-assistant.io/redirect/oauth` or your instance url i.e `http://homeassistant.local:8123`
 3. Add this repository in HACS and download TickTick Integration via HACS
-4. Setup the integration in devices tab
+4. In Settings → Devices & services, use the dotted menu to create new application credentials (`/config/application_credentials`). Enter the OAuth client ID and secret from the TickTick app here.
+5. Your TickTick Lists should now each turn up as a todo list in Home Assistant.
+
+If you don’t want all of your lists to show up in the todo list app, you can disable selected lists in the entities list
+(enter selection mode → Disable selected).
 
 ## Exposed Services
 
