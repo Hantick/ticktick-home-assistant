@@ -24,7 +24,7 @@ class TickTickAPIClient:
         self._headers = {"Authorization": f"Bearer {access_token}"}
         self._session = session
 
-    # === Task Scope ===
+    #region Task Scope
     async def get_task(
         self, projectId: str, taskId: str, returnAsJson: bool = False
     ) -> Task:
@@ -53,19 +53,26 @@ class TickTickAPIClient:
 
         return Task.from_dict(response)
 
-    async def complete_task(self, projectId: str, taskId: str) -> str:
-        """Complete a task."""
+    async def complete_task(self, projectId: str, taskId: str, returnAsJson = False) -> str:
+        """Complete a task.
+        
+        Note: returnAsJson parameter is unused but maintained for consistency with other methods.
+        """
         return await self._post(
             COMPLETE_TASK.format(projectId=projectId, taskId=taskId)
         )
 
-    async def delete_task(self, projectId: str, taskId: str) -> str:
-        """Delete a task."""
+    async def delete_task(self, projectId: str, taskId: str, returnAsJson = False) -> str:
+        """Delete a task.
+                
+        Note: returnAsJson parameter is unused but maintained for consistency with other methods.
+        """
         return await self._delete(
             DELETE_TASK.format(projectId=projectId, taskId=taskId)
         )
+    #endregion
 
-    # === Project Scope ===
+    #region Project Scope
     async def get_projects(self, returnAsJson: bool = False) -> list[Project]:
         """Return a dict of all projects basic informations."""
         response = await self._get(GET_PROJECTS)
@@ -81,11 +88,16 @@ class TickTickAPIClient:
         )
         return filtered_projects
 
-    async def get_project_with_tasks(self, projectId: str) -> list[ProjectWithTasks]:
+    async def get_project_with_tasks(self, projectId: str, returnAsJson: bool = False) -> list[ProjectWithTasks]:
         """Return a dict of tasks for project."""
         response = await self._get(GET_PROJECTS_WITH_TASKS.format(projectId=projectId))
-        return ProjectWithTasks.from_dict(response)
+        if returnAsJson:
+            return response
 
+        return ProjectWithTasks.from_dict(response)
+    #endregion
+
+    #region Http helpers
     async def _get(self, url: str) -> ClientResponse:
         response = await self._session.get(f"https://{url}", headers=self._headers)
         return await self._get_response(response)
@@ -118,3 +130,4 @@ class TickTickAPIClient:
         raise Exception(  # noqa: TRY002
             f"Unsucessful response from TickTick, status code: {response.status}, content: {await response.json()}"
         )
+    #endregion
