@@ -53,14 +53,20 @@ class TickTickAPIClient:
 
         return Task.from_dict(response)
 
-    async def complete_task(self, projectId: str, taskId: str) -> str:
-        """Complete a task."""
+    async def complete_task(self, projectId: str, taskId: str, returnAsJson = False) -> str:
+        """Complete a task.
+        
+        Note: returnAsJson parameter is unused but maintained for consistency with other methods.
+        """
         return await self._post(
             COMPLETE_TASK.format(projectId=projectId, taskId=taskId)
         )
 
-    async def delete_task(self, projectId: str, taskId: str) -> str:
-        """Delete a task."""
+    async def delete_task(self, projectId: str, taskId: str, returnAsJson = False) -> str:
+        """Delete a task.
+                
+        Note: returnAsJson parameter is unused but maintained for consistency with other methods.
+        """
         return await self._delete(
             DELETE_TASK.format(projectId=projectId, taskId=taskId)
         )
@@ -81,9 +87,12 @@ class TickTickAPIClient:
         )
         return filtered_projects
 
-    async def get_project_with_tasks(self, projectId: str) -> list[ProjectWithTasks]:
+    async def get_project_with_tasks(self, projectId: str, returnAsJson: bool = False) -> list[ProjectWithTasks]:
         """Return a dict of tasks for project."""
         response = await self._get(GET_PROJECTS_WITH_TASKS.format(projectId=projectId))
+        if returnAsJson:
+            return response
+
         return ProjectWithTasks.from_dict(response)
 
     async def _get(self, url: str) -> ClientResponse:
