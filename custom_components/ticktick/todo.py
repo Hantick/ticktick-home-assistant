@@ -1,6 +1,6 @@
 import asyncio
 from typing import Any
-from datetime import datetime
+from datetime import datetime, date
 
 from custom_components.ticktick.coordinator import TickTickCoordinator
 from custom_components.ticktick.ticktick_api_python.models.task import Task, TaskStatus
@@ -35,8 +35,8 @@ def _format_date_for_comparison(date_value) -> str:
     """Format a date value for comparison, handling different types."""
     if date_value is None:
         return ""
-    if isinstance(date_value, datetime):
-        # Convert datetime to string in a consistent format
+    if isinstance(date_value, (datetime, date)):
+        # Convert datetime/date to string in a consistent format
         return date_value.isoformat()
     if isinstance(date_value, str):
         return date_value.strip()
@@ -49,6 +49,14 @@ def _map_task(
 ) -> tuple[Task, bool]:
     """Convert a TodoItem to Task."""
     modified = False
+    item_due = item.due
+    is_all_day = False
+    
+    # Handle all-day tasks: If the item has a due date without time, ensure the API task is marked as all-day and compare just the date part
+    if isinstance(item.due, date):
+        item_due = datetime(item.due.year, item.due.month, item.due.day)
+        is_all_day = True
+    
     if api_task:
         if (item.summary or "").strip() != (api_task.title or "").strip():
             api_task.title = item.summary
@@ -58,11 +66,15 @@ def _map_task(
             modified = True
         
         # Handle due date comparison with proper type checking
-        item_due_str = _format_date_for_comparison(item.due)
+        item_due_str = _format_date_for_comparison(item_due)
         api_due_str = _format_date_for_comparison(api_task.dueDate)
         
         if item_due_str != api_due_str:
-            api_task.dueDate = item.due
+            api_task.dueDate = item_due
+            modified = True
+            
+        if is_all_day != api_task.isAllDay:
+            api_task.isAllDay = is_all_day
             modified = True
             
         return api_task, modified
@@ -70,7 +82,8 @@ def _map_task(
         projectId=projectId,
         title=item.summary,
         content=item.description,
-        dueDate=item.due,
+        dueDate=item_due,
+        isAllDay=is_all_day
     ), modified
 
 
