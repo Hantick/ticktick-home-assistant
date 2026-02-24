@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from enum import IntFlag
 
 
@@ -57,14 +57,18 @@ class CheckListItem:
     def to_dict(self) -> dict:
         """Convert this checklist item to a JSON-ready dict."""
         def _tt_datetime(val):
-            """Convert datetime/int/str to TickTick-compatible string."""
+            """Convert datetime/date/int/str to TickTick-compatible string."""
             if val is None:
                 return None
             if isinstance(val, datetime):
-                s = val.isoformat()
+                s = val.astimezone(val.tzinfo).strftime("%Y-%m-%dT%H:%M:%S%z")
+            elif isinstance(val, date):
+                # Convert date to datetime at midnight in local timezone
+                dt = datetime(val.year, val.month, val.day)
+                s = dt.astimezone().strftime("%Y-%m-%dT%H:%M:%S%z")
             elif isinstance(val, int):
                 # TickTick usually uses ms timestamps
-                s = datetime.fromtimestamp(val / 1000).isoformat()
+                s = datetime.fromtimestamp(val / 1000).strftime("%Y-%m-%dT%H:%M:%S%z")
             elif isinstance(val, str):
                 # Assume it’s already an ISO string
                 s = val
