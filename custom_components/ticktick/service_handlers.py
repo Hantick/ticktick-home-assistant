@@ -26,6 +26,12 @@ async def handle_get_task(client: TickTickAPIClient) -> Callable:
     return await _create_handler(client.get_task, PROJECT_ID, TASK_ID)
 
 
+async def handle_get_uid_from_task_summary(client: TickTickAPIClient) -> Callable:
+    """Return a handler function for the 'get_uid_from_task_summary' endpoint."""
+
+    return await _create_handler(client.get_uid_from_task_summary, PROJECT_ID, TASK_ID)
+
+
 async def handle_create_task(client: TickTickAPIClient) -> Callable:
     """Return a handler function for the 'create_task' endpoint."""
     return await _create_handler(client.create_task, *(Task.get_arg_names()), type=Task)
