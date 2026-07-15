@@ -132,7 +132,7 @@ async def register_services(
     )
     hass.services.async_register(
         DOMAIN,
-        "get_uid_from_summary",
+        "get_uid_from_task_summary",
         await handle_get_uid_from_task_summary(tickTickApiClient),
         supports_response=SupportsResponse.ONLY,
     )
