@@ -136,6 +136,9 @@ delete_task:
 get_projects:
   name: Get Projects
   description: "Returns a list of your projects basic information from TickTick"
+get_uid_from_task_summary:
+  name: Get UID from summary (title)
+  description: "Returns first uid of matching summary(title) from Ticktick"
 get_project:
   name: Get Project
   description: "Returns a project by Project ID basic information from TickTick"

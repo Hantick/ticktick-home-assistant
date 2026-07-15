@@ -11,7 +11,7 @@ BASE_API_URL = f"{TICKTICK_HOST}/{API}"
 # === Parameters === #
 PROJECT_ID = "projectId"
 TASK_ID = "taskId"
-
+SUMMARY="summary"
 # === Endpoints === #
 
 # === Task Scope ===
