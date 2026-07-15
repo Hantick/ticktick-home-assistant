@@ -137,7 +137,7 @@ get_projects:
   name: Get Projects
   description: "Returns a list of your projects basic information from TickTick"
 get_uid_from_task_summary:
-  name: Get UID from sumk ary (title)
+  name: Get UID from summary (title)
   description: "Returns first uid of matching summary(title) from Ticktick"
 get_project:
   name: Get Project
