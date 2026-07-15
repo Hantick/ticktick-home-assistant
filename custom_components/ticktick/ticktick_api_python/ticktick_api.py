@@ -88,13 +88,14 @@ class TickTickAPIClient:
 
     async def get_uid_from_task_summary(self, summary: str) -> str|None:
         """Return a uid of the first task matching this title."""
-        response = await self._get(GET_PROJECTS)
-        for project in response:
-            projectId=project.get("id")
-            project = await self._get(GET_PROJECTS_WITH_TASKS.format(projectId=projectId))
-            for task in project['tasks']:
-                if task.get("title")==summary:
-                    return task.get('id')
+        projects=await self.get_projects()
+        # response = await self._get(GET_UID_FROM_TASK_SUMMARY)
+        for project in projects:
+            tasks=await self.get_project_with_tasks(project.id)
+            if tasks.tasks:
+                for task in tasks.tasks:
+                    if task.title==summary:
+                        return task.id
         return 
 
 
