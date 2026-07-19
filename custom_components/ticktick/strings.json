@@ -1,6 +1,13 @@
 {
     "config": {
         "step": {
+            "user": {
+                "title": "Service",
+                "description": "Select TickTick (international) or Dida365 (China region). Each service uses its own OAuth and API endpoints, and its developer credentials cannot be shared with the other service.",
+                "data": {
+                    "region": "Service"
+                }
+            },
             "pick_implementation": {
                 "title": "[%key:common::config_flow::title::oauth2_pick_implementation%]"
             }
