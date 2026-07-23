@@ -39,6 +39,10 @@ async def handle_create_task(client: TickTickAPIClient) -> Callable:
     """Return a handler function for the 'create_task' endpoint."""
     return await _create_handler(client.create_task, *(Task.get_arg_names()), type=Task)
 
+async def handle_create_or_update_task(client: TickTickAPIClient) -> Callable:
+    """Return a handler function for the 'create_or_update_task' endpoint."""
+    return await _create_handler(client.create_task, *(Task.get_arg_names()), type=Task)
+
 
 async def handle_complete_task(client: TickTickAPIClient) -> Callable:
     """Return a handler function for the 'complete_task' endpoint."""

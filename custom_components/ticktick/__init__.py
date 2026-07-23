@@ -22,6 +22,7 @@ from .service_handlers import (
     handle_get_task,
     handle_get_uid_from_task_summary,
     handle_update_task,
+    handle_create_or_update_task,
 )
 from .ticktick_api_python.ticktick_api import TickTickAPIClient
 
@@ -102,6 +103,12 @@ async def register_services(
         DOMAIN,
         "create_task",
         await handle_create_task(tickTickApiClient),
+        supports_response=SupportsResponse.ONLY,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        "create_or_update_task",
+        await handle_create_or_update_task(tickTickApiClient),
         supports_response=SupportsResponse.ONLY,
     )
     hass.services.async_register(

@@ -309,3 +309,85 @@ update_task:
         number:
           min: 0
           max: 1000
+
+create_or_update_task:
+  name: Create Or Update Task
+  description: "Creates or updates a task in TickTick."
+  fields:
+    projectId:
+      name: Project ID
+      description: ID of the project (list) of tasks in TickTick.
+      required: true
+      example: 6987a8plg0rad90bc38b672f
+      selector:
+        text: null
+    title:
+      name: Title
+      description: "Task title."
+      required: true
+      example: To buy a cofee
+      selector:
+        text: null
+    content:
+      name: Content
+      description: "Task content."
+      example: Cofee for the author and for myself.
+      selector:
+        text: null
+    desc:
+      name: Description
+      description: "Description of the checklist."
+      selector:
+        text: null
+    isAllDay:
+      name: Lasts all day
+      description: "Flag indicating Whether the task is all day."
+      selector:
+        boolean: null
+    startDate:
+      name: Start Date
+      description: "Start date and time in 'yyyy-MM-dd HH:mm:ss' format."
+      example: 2024-12-29 03:00:00
+      selector:
+        datetime: {}
+    dueDate:
+      name: Due Date
+      description: "Due date and time in 'yyyy-MM-dd HH:mm:ss' format."
+      example: 2025-01-10T03:00:00
+      selector:
+        datetime: {}
+
+    timeZone:
+      name: Time Zone
+      description: "The time zone in which the time is specified."
+      selector:
+        text: null
+
+    repeatFlag:
+      name: Repeat Flag
+      description: "Recurring rules of the task."
+      selector:
+        text: null
+    reminders:
+      name: Reminders
+      description: "Reminders triggers for a task in iCalendar format i.e TRIGGER:P0DT9H0M0S"
+      example: "TRIGGER:P0DT9H0M0S"
+      selector:
+        text:
+          multiple: true
+    priority:
+      name: Priority
+      description: "The priority of the task."
+      selector:
+        select:
+          options:
+            - LOW
+            - MEDIUM
+            - HIGH
+    sortOrder:
+      name: Sort Order
+      description: "The order of the task."
+      selector:
+        number:
+          min: 0
+          max: 1000
