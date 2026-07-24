@@ -99,10 +99,13 @@ class TickTickAPIClient:
                         return task.id
         return 
 
-    async def create_or_update_task(
-        self, summary: str, returnAsJson: bool = False
-    ) -> str | None:
+    async def create_or_update_task(self, task: Task, returnAsJson: bool = False) -> Task:
         """Check if summary exists and update task if it does, if not, create new task"""
+        task_id=await self.get_uid_from_task_summary(task.title)
+        if task_id:
+            await self.update_task(self,Task)
+        else:
+            await self.create_task(self,Task)
         # projects=await self.get_projects()
         # for project in projects:
         #     tasks=await self.get_project_with_tasks(project.id)
