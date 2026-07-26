@@ -106,13 +106,6 @@ class TickTickAPIClient:
             await self.update_task(self,Task)
         else:
             await self.create_task(self,Task)
-        # projects=await self.get_projects()
-        # for project in projects:
-        #     tasks=await self.get_project_with_tasks(project.id)
-        #     if tasks.tasks:
-        #         for task in tasks.tasks:
-        #             if task.title==summary:
-        #                 return task.id
         return 
 
     async def _get(self, url: str) -> ClientResponse:
