@@ -101,7 +101,7 @@ class TickTickAPIClient:
 
     async def create_or_update_task(self, task: Task, returnAsJson: bool = False) -> Task:
         """Check if summary exists and update task if it does, if not, create new task"""
-        task_id=await self.get_uid_from_task_summary(task.title)
+        task_id=await self.get_uid_from_task_summary(task.get("title"))
         if task_id:
             await self.update_task(self,Task)
         else:
@@ -114,7 +114,6 @@ class TickTickAPIClient:
         #             if task.title==summary:
         #                 return task.id
         return 
-
 
     async def _get(self, url: str) -> ClientResponse:
         response = await self._session.get(f"https://{url}", headers=self._headers)
