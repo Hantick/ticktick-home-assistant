@@ -38,7 +38,11 @@ class TickTickAPIClient:
     async def create_task(self, task: Task, returnAsJson: bool = False) -> Task:
         """Create a task."""
         json = task.toJSON()
+        print(task.__dict__)
+        print(json)
         response = await self._post(CREATE_TASK, json)
+        print("CREATE RESPONSE")
+        print(response)
         if returnAsJson:
             return response
 
@@ -117,9 +121,32 @@ class TickTickAPIClient:
         response = await self._session.post(
             f"https://{url}",
             headers=self._headers,
-            data=json_body if json_body else None,
+            json=json_body if json_body else None,
         )
         return await self._get_response(response)
+
+    async def _put(self, url: str, json_body: dict | None = None) -> ClientResponse:
+        self._headers["Content-Type"] = "application/json"
+
+        response = await self._session.put(
+            f"https://{url}",
+            headers=self._headers,
+            json=json_body if json_body else None,
+        )
+
+        return await self._get_response(response)
+
+
+    async def update_task(self, task: Task, returnAsJson: bool = False) -> Task:
+        """Update a task."""
+        json_body = task.toJSON()
+
+        response = await self._put(UPDATE_TASK.format(taskId=task.id), json_body)
+
+        if returnAsJson:
+            return response
+
+        return Task.from_dict(response)
 
     async def _delete(self, url: str) -> ClientResponse:
         response = await self._session.delete(f"https://{url}", headers=self._headers)

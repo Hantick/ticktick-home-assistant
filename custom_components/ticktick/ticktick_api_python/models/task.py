@@ -104,7 +104,8 @@ class Task(CheckListItem):
         if "status" in d:
             d["status"] = 2 if int(d["status"]) else 0
 
-        return json.dumps(d, sort_keys=True)
+        # return json.dumps(d, sort_keys=True)
+        return d
 
     @classmethod
     def get_arg_names(cls) -> list[str]:
