@@ -50,8 +50,8 @@ class TickTickAPIClient:
 
     async def update_task(self, task: Task, returnAsJson: bool = False) -> Task:
         """Update a task."""
-        json = task.toJSON()
-        response = await self._post(UPDATE_TASK.format(taskId=task.id), json)
+        json_body = task.toJSON()
+        response = await self._post(UPDATE_TASK.format(taskId=task.id), json_body)
         if returnAsJson:
             return response
 
@@ -105,11 +105,12 @@ class TickTickAPIClient:
 
     async def create_or_update_task(self, task: Task, returnAsJson: bool = False) -> Task:
         """Check if summary exists and update task if it does, if not, create new task"""
-        task_id=await self.get_uid_from_task_summary(task.get("title"))
+        task_id=await self.get_uid_from_task_summary(summary=task.title)
         if task_id:
-            await self.update_task(self,Task)
+            task.id=task_id
+            await self.update_task(task,Task)
         else:
-            await self.create_task(self,Task)
+            await self.create_task(task,Task)
         return 
 
     async def _get(self, url: str) -> ClientResponse:
@@ -124,29 +125,6 @@ class TickTickAPIClient:
             json=json_body if json_body else None,
         )
         return await self._get_response(response)
-
-    async def _put(self, url: str, json_body: dict | None = None) -> ClientResponse:
-        self._headers["Content-Type"] = "application/json"
-
-        response = await self._session.put(
-            f"https://{url}",
-            headers=self._headers,
-            json=json_body if json_body else None,
-        )
-
-        return await self._get_response(response)
-
-
-    async def update_task(self, task: Task, returnAsJson: bool = False) -> Task:
-        """Update a task."""
-        json_body = task.toJSON()
-
-        response = await self._put(UPDATE_TASK.format(taskId=task.id), json_body)
-
-        if returnAsJson:
-            return response
-
-        return Task.from_dict(response)
 
     async def _delete(self, url: str) -> ClientResponse:
         response = await self._session.delete(f"https://{url}", headers=self._headers)

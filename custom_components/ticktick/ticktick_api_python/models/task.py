@@ -1,7 +1,6 @@
 from datetime import datetime
 from enum import Enum
 import inspect
-import json
 
 from .check_list_item import CheckListItem, TaskStatus
 
@@ -106,7 +105,6 @@ class Task(CheckListItem):
         if "status" in d:
             d["status"] = 2 if int(d["status"]) else 0
 
-        # return json.dumps(d, sort_keys=True)
         return d
 
     @classmethod
