@@ -108,10 +108,10 @@ class TickTickAPIClient:
         task_id=await self.get_uid_from_task_summary(summary=task.title)
         if task_id:
             task.id=task_id
-            await self.update_task(task,Task)
+            response = await self.update_task(task, returnAsJson=returnAsJson)
         else:
-            await self.create_task(task,Task)
-        return 
+            response = await self.create_task(task, returnAsJson=returnAsJson)
+        return response 
 
     async def _get(self, url: str) -> ClientResponse:
         response = await self._session.get(f"https://{url}", headers=self._headers)

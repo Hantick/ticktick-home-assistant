@@ -139,6 +139,14 @@ get_projects:
 get_uid_from_task_summary:
   name: Get UID from summary (title)
   description: "Returns first uid of matching summary(title) from Ticktick"
+  fields:
+    summary:
+      name: Summary
+      description: Summary (Title) of the task
+      required: true
+      example: New Task
+      selector:
+        text: null
 get_project:
   name: Get Project
   description: "Returns a project by Project ID basic information from TickTick"
