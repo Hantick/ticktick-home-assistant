@@ -38,7 +38,11 @@ class TickTickAPIClient:
     async def create_task(self, task: Task, returnAsJson: bool = False) -> Task:
         """Create a task."""
         json = task.toJSON()
+        print(task.__dict__)
+        print(json)
         response = await self._post(CREATE_TASK, json)
+        print("CREATE RESPONSE")
+        print(response)
         if returnAsJson:
             return response
 
@@ -46,8 +50,8 @@ class TickTickAPIClient:
 
     async def update_task(self, task: Task, returnAsJson: bool = False) -> Task:
         """Update a task."""
-        json = task.toJSON()
-        response = await self._post(UPDATE_TASK.format(taskId=task.id), json)
+        json_body = task.toJSON()
+        response = await self._post(UPDATE_TASK.format(taskId=task.id), json_body)
         if returnAsJson:
             return response
 
@@ -86,6 +90,48 @@ class TickTickAPIClient:
         response = await self._get(GET_PROJECTS_WITH_TASKS.format(projectId=projectId))
         return ProjectWithTasks.from_dict(response)
 
+    async def get_uid_from_task_summary(
+        self, summary: str, returnAsJson: bool = False
+    ) -> str | None:
+        """Return a uid of the first task matching this title."""
+        task = await self._get_task_from_summary(summary)
+        return task[0] if task else None
+
+    async def _get_task_from_summary(
+        self, summary: str
+    ) -> tuple[str, str] | None:
+        """Return the ID and project ID of the first task matching this title."""
+        inbox_response = await self._get(
+            GET_PROJECTS_WITH_TASKS.format(projectId="inbox")
+        )
+        for task in inbox_response.get("tasks", []):
+            if task.get("title") == summary:
+                task_id = task.get("id")
+                project_id = task.get("projectId", "inbox")
+                if task_id:
+                    return task_id, project_id
+
+        projects = await self.get_projects()
+        for project in projects:
+            project_with_tasks = await self.get_project_with_tasks(project.id)
+            if project_with_tasks.tasks:
+                for task in project_with_tasks.tasks:
+                    if task.title == summary:
+                        if task.id:
+                            return task.id, project.id
+
+        return None
+
+    async def create_or_update_task(self, task: Task, returnAsJson: bool = False) -> Task:
+        """Check if summary exists and update task if it does, if not, create new task"""
+        matching_task = await self._get_task_from_summary(summary=task.title)
+        if matching_task:
+            task.id, task.projectId = matching_task
+            response = await self.update_task(task, returnAsJson=returnAsJson)
+        else:
+            response = await self.create_task(task, returnAsJson=returnAsJson)
+        return response 
+
     async def _get(self, url: str) -> ClientResponse:
         response = await self._session.get(f"https://{url}", headers=self._headers)
         return await self._get_response(response)
@@ -95,7 +141,7 @@ class TickTickAPIClient:
         response = await self._session.post(
             f"https://{url}",
             headers=self._headers,
-            data=json_body if json_body else None,
+            json=json_body if json_body else None,
         )
         return await self._get_response(response)
 

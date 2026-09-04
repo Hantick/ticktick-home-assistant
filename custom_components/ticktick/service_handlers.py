@@ -26,9 +26,22 @@ async def handle_get_task(client: TickTickAPIClient) -> Callable:
     return await _create_handler(client.get_task, PROJECT_ID, TASK_ID)
 
 
+async def handle_get_uid_from_task_summary(client: TickTickAPIClient) -> Callable:
+    """Return a handler function for the 'get_uid_from_task_summary' endpoint."""
+    return await _create_handler(
+        client.get_uid_from_task_summary,
+        "summary",
+        returnAsJson=True,
+    )
+
+
 async def handle_create_task(client: TickTickAPIClient) -> Callable:
     """Return a handler function for the 'create_task' endpoint."""
     return await _create_handler(client.create_task, *(Task.get_arg_names()), type=Task)
+
+async def handle_create_or_update_task(client: TickTickAPIClient) -> Callable:
+    """Return a handler function for the 'create_or_update_task' endpoint."""
+    return await _create_handler(client.create_or_update_task, *(Task.get_arg_names()), type=Task)
 
 
 async def handle_complete_task(client: TickTickAPIClient) -> Callable:
@@ -161,6 +174,7 @@ async def _create_handler(
     client_method: Callable[..., Awaitable[Any]],
     *arg_names: str,
     type: type[T] | None = None,
+    returnAsJson: bool = True,
 ) -> Callable:
     """Create a reusable handler function for TickTick API endpoints."""
 
@@ -183,9 +197,9 @@ async def _create_handler(
                     except Exception:
                         args["priority"] = None
                 instance = type(**args)
-                response = await client_method(instance, returnAsJson=True)
+                response = await client_method(instance, returnAsJson=returnAsJson)
             else:
-                response = await client_method(**args, returnAsJson=True)
+                response = await client_method(**args, returnAsJson=returnAsJson)
 
             return {"data": response}  # noqa: TRY300
         except Exception as e:  # noqa: BLE001

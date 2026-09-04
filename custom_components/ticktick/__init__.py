@@ -20,7 +20,9 @@ from .service_handlers import (
     handle_delete_task,
     handle_get_projects,
     handle_get_task,
+    handle_get_uid_from_task_summary,
     handle_update_task,
+    handle_create_or_update_task,
 )
 from .ticktick_api_python.ticktick_api import TickTickAPIClient
 
@@ -105,6 +107,12 @@ async def register_services(
     )
     hass.services.async_register(
         DOMAIN,
+        "create_or_update_task",
+        await handle_create_or_update_task(tickTickApiClient),
+        supports_response=SupportsResponse.ONLY,
+    )
+    hass.services.async_register(
+        DOMAIN,
         "complete_task",
         await handle_complete_task(tickTickApiClient),
         supports_response=SupportsResponse.OPTIONAL,
@@ -127,6 +135,12 @@ async def register_services(
         DOMAIN,
         "get_projects",
         await handle_get_projects(tickTickApiClient),
+        supports_response=SupportsResponse.ONLY,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        "get_uid_from_task_summary",
+        await handle_get_uid_from_task_summary(tickTickApiClient),
         supports_response=SupportsResponse.ONLY,
     )
     # hass.services.async_register(DOMAIN, 'get_project', await handle_my_service)
