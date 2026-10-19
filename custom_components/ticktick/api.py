@@ -2,6 +2,7 @@
 
 from aiohttp import ClientSession
 
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers import config_entry_oauth2_flow
 
 
@@ -19,5 +20,12 @@ class AsyncConfigEntryAuth:
 
     async def async_get_access_token(self) -> str:
         """Return a valid access token."""
+        if (
+            not self._oauth_session.valid_token
+            and "refresh_token" not in self._oauth_session.token
+        ):
+            # TickTick issues no refresh token, so an expired access token can
+            # only be replaced by signing in again (#43).
+            raise ConfigEntryAuthFailed("TickTick access token expired")
         await self._oauth_session.async_ensure_token_valid()
         return self._oauth_session.token["access_token"]

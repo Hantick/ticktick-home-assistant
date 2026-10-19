@@ -10,10 +10,12 @@ from custom_components.ticktick.ticktick_api_python.models.project_with_tasks im
 )
 from custom_components.ticktick.ticktick_api_python.ticktick_api import (
     TickTickAPIClient,
+    TickTickAuthError,
 )
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 
@@ -53,6 +55,8 @@ class TickTickCoordinator(DataUpdateCoordinator[list[ProjectWithTasks]]):
             ]
 
             return await asyncio.gather(*fetch_projects_with_tasks)
+        except TickTickAuthError as err:
+            raise ConfigEntryAuthFailed(str(err)) from err
         except Exception as err:
             raise UpdateFailed(f"Error communicating with API: {err}") from err
 

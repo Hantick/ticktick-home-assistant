@@ -16,6 +16,10 @@ from .models.project_with_tasks import ProjectWithTasks
 from .models.task import Task
 
 
+class TickTickAuthError(Exception):
+    """TickTick rejected the access token."""
+
+
 class TickTickAPIClient:
     """TickTick API Client."""
 
@@ -115,6 +119,10 @@ class TickTickAPIClient:
             if json_data is None:  # Handle case when the response body is null
                 return {"status": "Success"}
             return json_data
+        if response.status == 401:
+            raise TickTickAuthError(
+                f"Unsucessful response from TickTick, status code: {response.status}"
+            )
         raise Exception(  # noqa: TRY002
             f"Unsucessful response from TickTick, status code: {response.status}, content: {await response.json()}"
         )
