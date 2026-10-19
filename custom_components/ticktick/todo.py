@@ -130,8 +130,9 @@ class TickTickTodoListEntity(CoordinatorEntity[TickTickCoordinator], TodoListEnt
                         )
                     )
 
-            if tasks_to_add:
-                self._attr_todo_items = tasks_to_add
+            # Replace even when empty, otherwise the last removed or completed
+            # task stays in Home Assistant after the list is cleared (#18).
+            self._attr_todo_items = tasks_to_add
 
         super()._handle_coordinator_update()
 
