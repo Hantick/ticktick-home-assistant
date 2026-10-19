@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 import datetime
 import logging
+from typing import Any
 
 from homeassistant.components.http import async_import_module
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant, SupportsResponse
+from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
 from homeassistant.helpers import aiohttp_client
 
 from . import api
@@ -55,8 +57,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: TickTickConfigEntry) -> 
 
     tickTickApiClient = TickTickAPIClient(access_token, aiohttp_session)
 
-    await register_coordiantor(hass, tickTickApiClient, entry, access_token)
-    await register_services(hass, tickTickApiClient)
+    coordinator = await register_coordiantor(
+        hass, tickTickApiClient, entry, access_token
+    )
+    await register_services(hass, tickTickApiClient, coordinator)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -76,7 +80,7 @@ async def register_coordiantor(
     tickTickApiClient: TickTickAPIClient,
     entry: TickTickConfigEntry,
     access_token: str,
-) -> None:
+) -> TickTickCoordinator:
     """Register Coordinator for TickTick Todo Entity."""
     coordinator = TickTickCoordinator(
         hass, _LOGGER, entry, SCAN_INTERVAL, tickTickApiClient, access_token
@@ -84,10 +88,24 @@ async def register_coordiantor(
     await coordinator.async_config_entry_first_refresh()
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = coordinator
+    return coordinator
+
+
+def _refresh_after(handler: Callable, coordinator: TickTickCoordinator) -> Callable:
+    """Refresh the to-do lists after a service changes a task."""
+
+    async def wrapped(call: ServiceCall) -> dict[str, Any]:
+        result = await handler(call)
+        await coordinator.async_refresh()
+        return result
+
+    return wrapped
 
 
 async def register_services(
-    hass: HomeAssistant, tickTickApiClient: TickTickAPIClient
+    hass: HomeAssistant,
+    tickTickApiClient: TickTickAPIClient,
+    coordinator: TickTickCoordinator,
 ) -> None:
     """Register TickTick services."""
 
@@ -100,26 +118,26 @@ async def register_services(
     hass.services.async_register(
         DOMAIN,
         "create_task",
-        await handle_create_task(tickTickApiClient),
+        _refresh_after(await handle_create_task(tickTickApiClient), coordinator),
         supports_response=SupportsResponse.ONLY,
     )
     hass.services.async_register(
         DOMAIN,
         "complete_task",
-        await handle_complete_task(tickTickApiClient),
+        _refresh_after(await handle_complete_task(tickTickApiClient), coordinator),
         supports_response=SupportsResponse.OPTIONAL,
     )
     hass.services.async_register(
         DOMAIN,
         "delete_task",
-        await handle_delete_task(tickTickApiClient),
+        _refresh_after(await handle_delete_task(tickTickApiClient), coordinator),
         supports_response=SupportsResponse.OPTIONAL,
     )
 
     hass.services.async_register(
         DOMAIN,
         "update_task",
-        await handle_update_task(tickTickApiClient),
+        _refresh_after(await handle_update_task(tickTickApiClient), coordinator),
         supports_response=SupportsResponse.OPTIONAL,
     )
 
