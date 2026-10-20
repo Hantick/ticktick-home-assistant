@@ -1,6 +1,6 @@
 import asyncio
 from typing import Any
-from datetime import datetime
+from datetime import date, datetime, time
 
 from custom_components.ticktick.coordinator import TickTickCoordinator
 from custom_components.ticktick.ticktick_api_python.models.task import Task, TaskStatus
@@ -15,6 +15,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN
 
@@ -31,17 +32,43 @@ async def async_setup_entry(
     )
 
 
-def _format_date_for_comparison(date_value) -> str:
-    """Format a date value for comparison, handling different types."""
-    if date_value is None:
-        return ""
-    if isinstance(date_value, datetime):
-        # Convert datetime to string in a consistent format
-        return date_value.isoformat()
-    if isinstance(date_value, str):
-        return date_value.strip()
-    # For any other type, convert to string
-    return str(date_value).strip()
+def _parse_ticktick_datetime(value: Any) -> datetime | None:
+    """Parse a TickTick timestamp such as 2026-10-26T04:00:00.000+0000."""
+    if value is None or isinstance(value, datetime):
+        return value
+    try:
+        return datetime.strptime(str(value), "%Y-%m-%dT%H:%M:%S.%f%z")
+    except ValueError:
+        return dt_util.parse_datetime(str(value))
+
+
+def _due_from_task(task: Task) -> date | datetime | None:
+    """Return the task's due date as Home Assistant expects it.
+
+    All-day tasks become a date in the task's time zone; others an aware datetime.
+    """
+    due = _parse_ticktick_datetime(task.dueDate)
+    if due is None:
+        return None
+    if task.isAllDay:
+        zone = dt_util.get_time_zone(task.timeZone) if task.timeZone else None
+        return due.astimezone(zone or dt_util.get_default_time_zone()).date()
+    return due
+
+
+def _due_for_ticktick(due: date | datetime | None) -> tuple[datetime | None, bool]:
+    """Convert a Home Assistant due value to a TickTick datetime and all-day flag.
+
+    datetime is a subclass of date, so it must be checked first.
+    """
+    if isinstance(due, datetime):
+        if due.tzinfo is None:
+            due = due.replace(tzinfo=dt_util.get_default_time_zone())
+        return due, False
+    if isinstance(due, date):
+        midnight = datetime.combine(due, time(), dt_util.get_default_time_zone())
+        return midnight, True
+    return None, False
 
 
 def _map_task(
@@ -49,6 +76,7 @@ def _map_task(
 ) -> tuple[Task, bool]:
     """Convert a TodoItem to Task."""
     modified = False
+    due, all_day = _due_for_ticktick(item.due)
     if api_task:
         if (item.summary or "").strip() != (api_task.title or "").strip():
             api_task.title = item.summary
@@ -56,21 +84,25 @@ def _map_task(
         if (item.description or "").strip() != (api_task.content or "").strip():
             api_task.content = item.description
             modified = True
-        
-        # Handle due date comparison with proper type checking
-        item_due_str = _format_date_for_comparison(item.due)
-        api_due_str = _format_date_for_comparison(api_task.dueDate)
-        
-        if item_due_str != api_due_str:
-            api_task.dueDate = item.due
+
+        api_due = _parse_ticktick_datetime(api_task.dueDate)
+        if due is not None and (due != api_due or all_day != bool(api_task.isAllDay)):
+            # A single-day task has startDate == dueDate; keep them together so
+            # moving the due date doesn't turn it into a multi-day span.
+            if _parse_ticktick_datetime(api_task.startDate) == api_due:
+                api_task.startDate = due
+            api_task.dueDate = due
+            api_task.isAllDay = all_day
             modified = True
-            
+
         return api_task, modified
     return Task(
         projectId=projectId,
         title=item.summary,
         content=item.description,
-        dueDate=item.due,
+        dueDate=due,
+        startDate=due,
+        isAllDay=all_day if due is not None else None,
     ), modified
 
 
@@ -125,7 +157,7 @@ class TickTickTodoListEntity(CoordinatorEntity[TickTickCoordinator], TodoListEnt
                             status=TodoItemStatus.COMPLETED
                             if task.status == TaskStatus.COMPLETED
                             else TodoItemStatus.NEEDS_ACTION,
-                            due=task.dueDate,
+                            due=_due_from_task(task),
                             description=task.content or None,  # Don't use empty string
                         )
                     )
