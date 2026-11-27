@@ -53,14 +53,26 @@ class TickTickAPIClient:
 
         return Task.from_dict(response)
 
-    async def complete_task(self, projectId: str, taskId: str) -> str:
-        """Complete a task."""
+    async def complete_task(
+        self, projectId: str, taskId: str, returnAsJson: bool = False
+    ) -> str:
+        """Complete a task.
+
+        Accept returnAsJson for service-handler compatibility; this endpoint
+        already returns the raw response, so no model conversion is needed.
+        """
         return await self._post(
             COMPLETE_TASK.format(projectId=projectId, taskId=taskId)
         )
 
-    async def delete_task(self, projectId: str, taskId: str) -> str:
-        """Delete a task."""
+    async def delete_task(
+        self, projectId: str, taskId: str, returnAsJson: bool = False
+    ) -> str:
+        """Delete a task.
+
+        Accept returnAsJson for service-handler compatibility; this endpoint
+        already returns the raw response, so no model conversion is needed.
+        """
         return await self._delete(
             DELETE_TASK.format(projectId=projectId, taskId=taskId)
         )
